@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Irish Algebra Academy</title>
+<style>
+:root{--navy:#10233f;--blue:#2563eb;--green:#16a34a;--bg:#f1f5fb;--ink:#1e293b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#10233f,#2563eb);color:white;padding:25px}
+header h1{margin:0;font-size:30px}
+header p{margin:8px 0}
+.layout{display:grid;grid-template-columns:270px 1fr;min-height:85vh}
+aside{background:white;padding:18px;border-right:1px solid #ddd}
+main{padding:25px;max-width:1100px;width:100%;margin:auto}
+button,select,input{font:inherit}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 15px}
+.topic{display:block;width:100%;text-align:left;background:#eef3ff;margin:7px 0}
+.topic:hover,.topic.active{background:#2563eb;color:white}
+.card{background:white;border-radius:15px;padding:24px;margin-bottom:20px;box-shadow:0 4px 15px #0000000b}
+.badge{display:inline-block;background:#dbeafe;color:#1d4ed8;padding:6px 10px;border-radius:20px;font-size:12px}
+.example{background:#eff6ff;border-left:5px solid #2563eb;padding:18px;border-radius:8px;line-height:1.9}
+.visual{background:#f8fafc;border:1px dashed #94a3b8;padding:20px;border-radius:10px;margin-top:15px}
+.tile{display:inline-flex;align-items:center;justify-content:center;padding:12px;min-width:45px;margin:5px;border-radius:8px;background:#bfdbfe;font-weight:bold}
+.tile.number{background:#bbf7d0}
+.answer{padding:12px;border:2px solid #cbd5e1;border-radius:8px;width:100%;max-width:380px}
+.primary{background:#2563eb;color:white}
+.secondary{background:#e2e8f0}
+.success{color:#15803d;font-weight:bold}
+.error{color:#b91c1c;font-weight:bold}
+.progress{height:12px;background:#e2e8f0;border-radius:20px;overflow:hidden}
+#bar{height:100%;background:#22c55e;width:0%;transition:.3s}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+small{color:#64748b}
+@media(max-width:750px){.layout{grid-template-columns:1fr}aside{border-right:0}main{padding:12px}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🇮🇪 Irish Algebra Academy</h1>
+<p>Junior Cycle → Leaving Certificate Ordinary & Higher Level</p>
+<p>Learn • Explore • Practise • Understand</p>
+</header>
+
+<div class="layout">
+<aside>
+<h3>Choose your level</h3>
+<select id="level" onchange="renderMenu()" style="width:100%;padding:10px">
+<option value="all">All levels</option>
+<option value="Junior Cycle">Junior Cycle</option>
+<option value="Leaving Cert Ordinary">Leaving Cert Ordinary</option>
+<option value="Leaving Cert Higher">Leaving Cert Higher</option>
+</select>
+<h3>Algebra topics</h3>
+<div id="menu"></div>
+<h3>Your progress</h3>
+<div class="progress"><div id="bar"></div></div>
+<p id="progressText">0 questions completed</p>
+</aside>
+
+<main>
+<div class="card">
+<span class="badge" id="levelLabel">Junior Cycle</span>
+<h2 id="title"></h2>
+<p id="context"></p>
+<h3>Understanding the idea</h3>
+<p id="explanation"></p>
+<h3>Worked example</h3>
+<div class="example" id="example"></div>
+<h3>Visual explanation</h3>
+<div class="visual" id="visual"></div>
+</div>
+
+<div class="card">
+<h2>✏️ Try it yourself</h2>
+<p id="question"></p>
+<input id="answer" class="answer" placeholder="Type your answer">
+<div class="controls">
+<button class="primary" onclick="checkAnswer()">Check answer</button>
+<button class="secondary" onclick="showHint()">Hint</button>
+<button class="secondary" onclick="showSolution()">Show solution</button>
+<button class="secondary" onclick="nextQuestion()">Next question →</button>
+</div>
+<p id="feedback" aria-live="polite"></p>
+</div>
+
+<div class="card">
+<h3>Irish curriculum connection</h3>
+<p id="curriculum"></p>
+<p><a href="https://www.curriculumonline.ie/" target="_blank">Curriculum Online</a> |
+<a href="https://www.examinations.ie/" target="_blank">State Examinations Commission</a></p>
+</div>
+</main>
+</div>
+
+<script>
+const topics=[
+{
+title:"Adding Like Terms",level:"Junior Cycle",
+context:"Algebra uses letters to represent numbers. Like terms have the same letters raised to the same powers.",
+explanation:"You can add 3x and 2x because both are x terms. You cannot combine 3x and 2y into one term.",
+example:["3x + 2x + 4","= 5x + 4","Only the x terms combine."],
+visual:["x","x","x","+","x","x","=","5x"],
+curriculum:"Junior Cycle: algebraic expressions and simplifying expressions.",
+questions:[
+["3x + 2x","5x","Add the coefficients 3 and 2.","3x + 2x = 5x"],
+["7a - 4a","3a","Subtract 4 from 7.","7a - 4a = 3a"],
+["2x + 5 + 4x","6x+5","Combine x terms, keeping 5.","2x + 4x + 5 = 6x + 5"]
+]},
+{
+title:"Substitution",level:"Junior Cycle",
+context:"Substitution means replacing a letter with a known number.",
+explanation:"Replace the variable with its value, then follow the order of operations.",
+example:["Find 3x + 2 when x = 4","= 3(4) + 2","= 12 + 2 = 14"],
+visual:["3","×","4","+","2","=","14"],
+curriculum:"Junior Cycle: evaluating algebraic expressions.",
+questions:[
+["2x + 3 when x = 5","13","Replace x with 5.","2(5)+3=13"],
+["4a - 2 when a = 3","10","Multiply first.","4(3)-2=10"],
+["x² + 1 when x = 4","17","Square 4.","16+1=17"]
+]},
+{
+title:"Expanding Brackets",level:"Junior Cycle",
+context:"Expanding means removing brackets using multiplication.",
+explanation:"Multiply every term inside the bracket by the term outside.",
+example:["3(x + 4)","= 3 × x + 3 × 4","= 3x + 12"],
+visual:["3","×","(x + 4)","=","3x + 12"],
+curriculum:"Junior Cycle: distributive law and algebraic manipulation.",
+questions:[
+["2(x + 3)","2x+6","Multiply both terms by 2.","2x+6"],
+["4(a - 2)","4a-8","Multiply 4 by a and -2.","4a-8"],
+["-3(x + 2)","-3x-6","Multiply by negative 3.","-3x-6"]
+]},
+{
+title:"Solving Linear Equations",level:"Junior Cycle",
+context:"An equation is like a balanced weighing scale.",
+explanation:"Whatever you do to one side, you must do to the other side.",
+example:["2x + 3 = 11","Subtract 3: 2x = 8","Divide by 2: x = 4"],
+visual:["2x + 3","⚖️","11"],
+curriculum:"Junior Cycle: solving linear equations.",
+questions:[
+["x + 7 = 12","5","Subtract 7.","x=5"],
+["3x = 18","6","Divide by 3.","x=6"],
+["2x + 5 = 17","6","Subtract 5 then divide by 2.","2x=12, x=6"]
+]},
+{
+title:"Factorising Expressions",level:"Junior Cycle",
+context:"Factorising is the reverse of expanding.",
+explanation:"Find the highest common factor and put it outside brackets.",
+example:["6x + 9","Common factor = 3","= 3(2x + 3)"],
+visual:["6x","+","9","=","3(2x+3)"],
+curriculum:"Junior Cycle: common factors and factorisation.",
+questions:[
+["4x + 8","4(x+2)","Factor out 4.","4(x+2)"],
+["6a + 9","3(2a+3)","Factor out 3.","3(2a+3)"],
+["x² + 5x","x(x+5)","Both terms contain x.","x(x+5)"]
+]},
+{
+title:"Algebraic Fractions",level:"Leaving Cert Ordinary",
+context:"Algebraic fractions work like numerical fractions.",
+explanation:"Factorise and cancel common factors, but never cancel across addition.",
+example:["(6x²)/(3x)","= (6/3) × (x²/x)","= 2x, where x ≠ 0"],
+visual:["6x²","÷","3x","=","2x"],
+curriculum:"Leaving Certificate: algebraic fractions and manipulation.",
+questions:[
+["6x/3","2x","Divide 6 by 3.","2x"],
+["8a²/4a","2a","Divide coefficients and cancel one a.","2a"],
+["(x²+3x)/x","x+3","Factorise the numerator first.","x(x+3)/x=x+3"]
+]},
+{
+title:"Simultaneous Equations",level:"Leaving Cert Ordinary",
+context:"Two equations can describe two unknown values.",
+explanation:"Use elimination or substitution to find values satisfying both equations.",
+example:["x + y = 9; x - y = 3","Add: 2x = 12, so x = 6","Then y = 3"],
+visual:["x + y = 9","x - y = 3","x = 6, y = 3"],
+curriculum:"Leaving Certificate: simultaneous linear equations.",
+questions:[
+["x+y=7 and x-y=1. Find x.","4","Add both equations.","2x=8, x=4"],
+["x+y=10 and x-y=4. Find y.","3","Find x first.","x=7, y=3"],
+["2x+y=8 and x+y=5. Find x.","3","Subtract equations.","x=3"]
+]},
+{
+title:"Quadratic Equations",level:"Leaving Cert Ordinary",
+context:"Quadratic equations contain a squared variable.",
+explanation:"A quadratic may have two solutions. Factorisation is one way to find them.",
+example:["x² - 5x + 6 = 0","(x - 2)(x - 3) = 0","x = 2 or x = 3"],
+visual:["x²","−5x","+6","→","(x−2)(x−3)"],
+curriculum:"Leaving Certificate: quadratic expressions and equations.",
+questions:[
+["x²-9=0. Give positive root.","3","Use difference of squares.","x=3 or -3"],
+["x²-5x+6=0. Give smaller root.","2","Factorise.","x=2 or 3"],
+["x²-7x+12=0. Give larger root.","4","Find numbers multiplying to 12 and adding to 7.","x=3 or 4"]
+]},
+{
+title:"Inequalities",level:"Leaving Cert Ordinary",
+context:"Inequalities compare quantities rather than stating equality.",
+explanation:"Solve as normal, but reverse the inequality sign when multiplying or dividing by a negative number.",
+example:["-2x > 6","Divide by -2 and reverse sign","x < -3"],
+visual:["-2x > 6","→","x < -3"],
+curriculum:"Leaving Certificate: linear inequalities.",
+questions:[
+["x+3>7","x>4","Subtract 3.","x>4"],
+["2x≤10","x≤5","Divide by 2.","x≤5"],
+["-3x<12","x>-4","Reverse sign when dividing by -3.","x>-4"]
+]},
+{
+title:"Quadratic Formula",level:"Leaving Cert Higher",
+context:"Some quadratics are difficult to factorise.",
+explanation:"For ax²+bx+c=0, use x=(-b±√(b²-4ac))/(2a).",
+example:["x² - 4x - 5 = 0","a=1, b=-4, c=-5","x=(4±6)/2, so x=5 or -1"],
+visual:["ax² + bx + c = 0","→","(-b ± √(b²−4ac))/2a"],
+curriculum:"Leaving Certificate: quadratic formula and discriminant.",
+questions:[
+["x²-4x-5=0. Give positive root.","5","Use the formula or factorise.","x=5 or -1"],
+["x²-6x+8=0. Give smaller root.","2","Find the two roots.","x=2 or 4"],
+["For x²+2x+1=0, find discriminant.","0","Calculate b²-4ac.","4-4=0"]
+]},
+{
+title:"Functions",level:"Leaving Cert Higher",
+context:"A function assigns an output to each input.",
+explanation:"For f(x)=2x+3, replace x with the given input.",
+example:["f(x)=2x+3","f(4)=2(4)+3","f(4)=11"],
+visual:["Input 4","→","f(x)=2x+3","→","Output 11"],
+curriculum:"Leaving Certificate: functions, notation and composition.",
+questions:[
+["f(x)=3x+2. Find f(4).","14","Substitute 4.","12+2=14"],
+["f(x)=x²-1. Find f(3).","8","Square 3.","9-1=8"],
+["f(x)=2x+1. Find f(-2).","-3","Use brackets around -2.","-4+1=-3"]
+]},
+{
+title:"Completing the Square",level:"Leaving Cert Higher",
+context:"Completing the square reveals the turning point of a quadratic.",
+explanation:"For x²+bx, add and subtract (b/2)².",
+example:["x² + 6x + 5","= (x+3)² - 9 + 5","= (x+3)² - 4"],
+visual:["x² + 6x + 5","→","(x+3)²−4"],
+curriculum:"Leaving Certificate Higher Level: quadratic forms and completing the square.",
+questions:[
+["x²+4x+1=(x+2)²+k. Find k.","-3","Expand (x+2)².","k=-3"],
+["x²+6x+5=(x+3)²+k. Find k.","-4","Subtract 9.","k=-4"],
+["x²-8x+10=(x-4)²+k. Find k.","-6","Expand the square.","k=-6"]
+]}
+];
+
+let current=0,qi=0;
+let completed=new Set(JSON.parse(localStorage.getItem("algebraCompleted")||"[]"));
+
+function renderMenu(){
+const menu=document.getElementById("menu");
+const filter=document.getElementById("level").value;
+menu.innerHTML="";
+topics.forEach((t,i)=>{
+if(filter!=="all"&&t.level!==filter)return;
+let b=document.createElement("button");
+b.className="topic"+(i===current?" active":"");
+b.textContent=(completed.has(i+"-0")?"✓ ":"")+t.title;
+b.onclick=()=>loadTopic(i);
+menu.appendChild(b);
+});
+}
+
+function loadTopic(i){
+current=i;qi=0;
+let t=topics[i];
+document.getElementById("levelLabel").textContent=t.level;
+document.getElementById("title").textContent=t.title;
+document.getElementById("context").textContent=t.context;
+document.getElementById("explanation").textContent=t.explanation;
+document.getElementById("example").innerHTML=t.example.map(x=>"<div>"+escapeHTML(x)+"</div>").join("");
+document.getElementById("visual").innerHTML=t.visual.map(x=>'<span class="tile">'+escapeHTML(x)+'</span>').join("");
+document.getElementById("curriculum").textContent=t.curriculum;
+renderQuestion();renderMenu();updateProgress();
+}
+
+function escapeHTML(s){
+return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+function renderQuestion(){
+let q=topics[current].questions[qi];
+document.getElementById("question").textContent=
+"Question "+(qi+1)+" of "+topics[current].questions.length+": "+q[0];
+document.getElementById("answer").value="";
+document.getElementById("feedback").textContent="";
+}
+
+function normalise(s){
+return String(s).toLowerCase().replace(/\s/g,"").replace(/−/g,"-").replace(/≤/g,"<=").replace(/≥/g,">=");
+}
+
+function checkAnswer(){
+let q=topics[current].questions[qi];
+let input=normalise(document.getElementById("answer").value);
+let feedback=document.getElementById("feedback");
+if(!input){feedback.textContent="Enter an answer first.";return;}
+if(input===normalise(q[1])){
+feedback.className="success";
+feedback.textContent="✓ Correct! Well done.";
+completed.add(current+"-"+qi);
+localStorage.setItem("algebraCompleted",JSON.stringify([...completed]));
+updateProgress();renderMenu();
+}else{
+feedback.className="error";
+feedback.textContent="Not quite. Try the hint or worked solution.";
+}
+}
+
+function showHint(){
+let f=document.getElementById("feedback");
+f.className="";
+f.textContent="💡 Hint: "+topics[current].questions[qi][2];
+}
+
+function showSolution(){
+let f=document.getElementById("feedback");
+f.className="";
+f.textContent="Solution: "+topics[current].questions[qi][3];
+}
+
+function nextQuestion(){
+qi=(qi+1)%topics[current].questions.length;
+renderQuestion();
+}
+
+function updateProgress(){
+let total=topics.reduce((sum,t)=>sum+t.questions.length,0);
+document.getElementById("bar").style.width=(completed.size/total*100)+"%";
+document.getElementById("progressText").textContent=
+completed.size+" of "+total+" questions completed";
+}
+
+document.getElementById("answer").addEventListener("keydown",e=>{
+if(e.key==="Enter")checkAnswer();
+});
+loadTopic(0);
+</script>
+</body>
+</html>
